@@ -33,6 +33,8 @@ public class Main {
 
 		try ( ExecutorService executor = Executors.newCachedThreadPool() ) {
 
+			Cache cache = new Cache();
+
 			do {
 
 				Scanner in = new Scanner(System.in);
@@ -43,7 +45,19 @@ public class Main {
 			
 				DataFetcher fetcher = new DataFetcher(input);
 				executor.submit( () -> {
-					fetcher.execute();
+					try {
+						Coordinates coords = cache.getGeocode(input);
+						fetcher.setCoordinates(coords);
+					} catch (IllegalArgumentException ex) {
+						fetcher.fetchCoordinates();
+					}
+
+					try {
+						double temp = cache.getWeather(fetcher.getCoordinates());
+						fetcher.setTemperature(temp);
+					} catch (IllegalArgumentException ex) {
+						fetcher.fetchTemperature();
+					}
 				} );
 			
 			} while (true);

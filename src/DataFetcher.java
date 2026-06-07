@@ -5,8 +5,7 @@ import java.net.http.*;
 public class DataFetcher {
 
     private String city;
-    private double latitude;
-    private double longitude;
+    private Coordinates coords;
     private double temperature;
     private HttpClient client;
 
@@ -22,7 +21,7 @@ public class DataFetcher {
 
     }
 
-    private void fetchCoordinates() {
+    public void fetchCoordinates() {
 
         String urlString = "https://geocoding-api.open-meteo.com/v1/search?name=" + city + "&count=1&language=en";
         HttpRequest request = HttpRequest.newBuilder()
@@ -33,8 +32,10 @@ public class DataFetcher {
             
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                latitude = JsonParser.findDoubleField(response.body(), "latitude");
-                longitude = JsonParser.findDoubleField(response.body(), "longitude");
+                coords = new Coordinates(
+                    JsonParser.findDoubleField(response.body(), "latitude"),
+                    JsonParser.findDoubleField(response.body(), "longitude")
+                );
             } else {
 
             }
@@ -44,8 +45,20 @@ public class DataFetcher {
 
     }
 
-    private void fetchTemperature() {
+    public void fetchTemperature() {
 
+    }
+
+    public void setCoordinates(Coordinates coords) {
+        this.coords = coords;
+    }
+
+    public void setTemperature(double temp) {
+        this.temperature = temp;
+    }
+
+    public Coordinates getCoordinates() {
+        return this.coords;
     }
 
 }

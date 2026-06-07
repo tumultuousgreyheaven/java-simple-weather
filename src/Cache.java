@@ -3,13 +3,24 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Cache {
 
-    private static final double cacheTTLsecs = 60.0;
+    private static final long cacheTTLsecs = 60;
     private final ConcurrentHashMap<String, GeocodeCacheEntry> geocodeCache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Coordinates, WeatherCacheEntry> weatherCache = new ConcurrentHashMap<>();
 
     public Coordinates getGeocode(String city) throws IllegalArgumentException {
-        // geocodeCache.compute
-        throw new IllegalArgumentException("No relevant cache entry");
+        return geocodeCache.compute(city, (key, cachedCoords) -> {
+            if (cachedCoords != null && !cachedCoords.isExpired(cacheTTLsecs))
+                return cachedCoords;
+            throw new IllegalArgumentException("Geocode cache miss");
+        }).getCoords();
+    }
+
+    public double getWeather(Coordinates coords) throws IllegalArgumentException {
+        return weatherCache.compute(coords, (key, cachedTemp) -> {
+            if (cachedTemp != null && !cachedTemp.isExpired(cacheTTLsecs))
+                return cachedTemp;
+            throw new IllegalArgumentException("Weather cache miss");
+        }).getTemp();
     }
 
     private static class GeocodeCacheEntry {
@@ -20,6 +31,14 @@ public class Cache {
             this.coords = new Coordinates(latitude, longitude);
             this.createdAt = Instant.now();
         }
+
+        public Coordinates getCoords() {
+            return this.coords;
+        }
+        
+        public boolean isExpired(long cacheTTLsecs) {
+            return Instant.now().getEpochSecond() - this.createdAt.getEpochSecond() > cacheTTLsecs;
+        }
     }
 
     private static class WeatherCacheEntry {
@@ -29,6 +48,14 @@ public class Cache {
         WeatherCacheEntry(double temperature) {
             this.temperature = temperature;
             this.createdAt = Instant.now();
+        }
+
+        public double getTemp() {
+            return this.temperature;
+        }
+
+        public boolean isExpired(long cacheTTLsecs) {
+            return Instant.now().getEpochSecond() - this.createdAt.getEpochSecond() > cacheTTLsecs;
         }
     }
 
