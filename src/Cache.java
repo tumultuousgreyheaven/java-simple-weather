@@ -7,20 +7,28 @@ public class Cache {
     private final ConcurrentHashMap<String, GeocodeCacheEntry> geocodeCache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Coordinates, WeatherCacheEntry> weatherCache = new ConcurrentHashMap<>();
 
-    public Coordinates getGeocode(String city) throws IllegalArgumentException {
-        return geocodeCache.compute(city, (key, cachedCoords) -> {
+    public Coordinates getGeocode(String city) throws Exception {
+        GeocodeCacheEntry geocodeCacheEntry = geocodeCache.compute(city, (key, cachedCoords) -> {
             if (cachedCoords != null && !cachedCoords.isExpired(cacheTTLsecs))
                 return cachedCoords;
-            throw new IllegalArgumentException("Geocode cache miss");
-        }).getCoords();
+            return null;
+        });
+        if (geocodeCacheEntry == null)
+            throw new Exception("Cache miss for geocode");
+        else
+            return geocodeCacheEntry.getCoords();
     }
 
-    public double getWeather(Coordinates coords) throws IllegalArgumentException {
-        return weatherCache.compute(coords, (key, cachedTemp) -> {
+    public double getWeather(Coordinates coords) throws Exception {
+        WeatherCacheEntry weatherCacheEntry = weatherCache.compute(coords, (key, cachedTemp) -> {
             if (cachedTemp != null && !cachedTemp.isExpired(cacheTTLsecs))
                 return cachedTemp;
-            throw new IllegalArgumentException("Weather cache miss");
-        }).getTemp();
+            return null;
+        });
+        if (weatherCacheEntry == null)
+            throw new Exception("Cache miss for weather");
+        else
+            return weatherCacheEntry.getTemp();
     }
 
     private static class GeocodeCacheEntry {

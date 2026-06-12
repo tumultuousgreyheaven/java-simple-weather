@@ -48,15 +48,23 @@ public class Main {
 					try {
 						Coordinates coords = cache.getGeocode(input);
 						fetcher.setCoordinates(coords);
-					} catch (IllegalArgumentException ex) {
-						fetcher.fetchCoordinates();
+					} catch (Exception ex) {
+						try {
+							fetcher.fetchCoordinates();
+						} catch (Exception fetchEx) {
+							fetchEx.getMessage();
+						}
 					}
 
 					try {
 						double temp = cache.getWeather(fetcher.getCoordinates());
 						fetcher.setTemperature(temp);
-					} catch (IllegalArgumentException ex) {
-						fetcher.fetchTemperature();
+					} catch (Exception ex) {
+						try {
+							fetcher.fetchTemperature();
+						} catch (Exception fetchEx) {
+							fetchEx.getMessage();
+						}
 					}
 				} );
 			
