@@ -1,6 +1,3 @@
-// import java.io.*;
-// import java.net.URI;
-// import java.net.http.*;
 import java.util.Scanner;
 import java.util.concurrent.*;
 
@@ -21,7 +18,8 @@ public class Main {
 					break;
 			
 				DataFetcher fetcher = new DataFetcher(input);
-				executor.submit( () -> {
+
+				CompletableFuture<Double> future = CompletableFuture.supplyAsync(() -> {
 					try {
 						Coordinates coords = cache.getGeocode(input);
 						fetcher.setCoordinates(coords);
@@ -34,8 +32,7 @@ public class Main {
 						}
 					}
 					if (fetcher.getCoordinates() == null)
-						return;
-					// TODO: implement Future handling in the main thread
+						throw new RuntimeException("Failed to fetch city coordinates from geocoding API");
 
 					try {
 						double temp = cache.getWeather(fetcher.getCoordinates());
@@ -48,7 +45,14 @@ public class Main {
 							fetchEx.getMessage();
 						}
 					}
-				} );
+					if (fetcher.getTemperature() == Double.NaN)
+						throw new RuntimeException("Failed to fetch temperature from meteo API");
+					
+					return fetcher.getTemperature();
+				});
+
+				future.thenAcceptAsync(temp -> System.out.printf("Temperature in %s: %.1f", input, temp), executor);
+				// TODO: handle exceptions
 			
 			} while (true);
 

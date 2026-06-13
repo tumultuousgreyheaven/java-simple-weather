@@ -1,4 +1,3 @@
-// import java.io.*;
 import java.net.URI;
 import java.net.http.*;
 
@@ -12,6 +11,10 @@ public class DataFetcher {
     DataFetcher(String city) {
         this.city = city;
         client = HttpClient.newHttpClient();
+
+        // necessary to recognize whether fetch procedure have failed
+        this.coords = null;
+        this.temperature = Double.NaN;
     }
 
     public void fetchCoordinates() throws Exception {
