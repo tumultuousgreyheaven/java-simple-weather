@@ -15,4 +15,15 @@ public class JsonParser {
         }
     }
 
+    public static String findFieldAsString(String json, String field) throws Exception {
+        Pattern pattern = Pattern.compile("\"" + field + "\":*,");
+        Matcher matcher = pattern.matcher(json);
+        if (matcher.find()) {
+            String entry = matcher.group();
+            return entry.split(":")[1];
+        } else {
+            throw new Exception("Cannot find field " + field);
+        }
+    }
+
 }

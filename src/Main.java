@@ -8,29 +8,6 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		/*
-		try (FileWriter outFile = new FileWriter("temp.json", false)) {
-
-			HttpClient client = HttpClient.newHttpClient();
-			HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create("https://api.open-meteo.com/v1/forecast?latitude=60.00&longitude=30.00&current=temperature_2m"))
-				.build();
-			
-			try {
-				outFile.write(
-					client.send(request, HttpResponse.BodyHandlers.ofString()).body()
-				);
-			} catch (InterruptedException ex) {
-				System.out.println(ex.getMessage());
-			}
-
-			outFile.flush();
-
-		} catch (IOException ex) {
-			System.out.println(ex.getMessage());
-		}
-		*/
-
 		try ( ExecutorService executor = Executors.newCachedThreadPool() ) {
 
 			Cache cache = new Cache();
@@ -38,7 +15,7 @@ public class Main {
 			do {
 
 				Scanner in = new Scanner(System.in);
-				String input = in.next();
+				String input = in.nextLine();
 
 				if (input.equals("close"))
 					break;
@@ -51,10 +28,14 @@ public class Main {
 					} catch (Exception ex) {
 						try {
 							fetcher.fetchCoordinates();
+							cache.addGeocode(input, fetcher.getCoordinates());
 						} catch (Exception fetchEx) {
 							fetchEx.getMessage();
 						}
 					}
+					if (fetcher.getCoordinates() == null)
+						return;
+					// TODO: implement Future handling in the main thread
 
 					try {
 						double temp = cache.getWeather(fetcher.getCoordinates());
@@ -62,6 +43,7 @@ public class Main {
 					} catch (Exception ex) {
 						try {
 							fetcher.fetchTemperature();
+							cache.addWeather(fetcher.getCoordinates(), fetcher.getTemperature());
 						} catch (Exception fetchEx) {
 							fetchEx.getMessage();
 						}
