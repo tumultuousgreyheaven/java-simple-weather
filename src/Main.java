@@ -14,7 +14,7 @@ public class Main {
 				Scanner in = new Scanner(System.in);
 				String input = in.nextLine();
 
-				if (input.equals("close"))
+				if (input.equals("close") || input.equals("exit") || input.equals("quit"))
 					break;
 			
 				DataFetcher fetcher = new DataFetcher(input);
@@ -28,7 +28,7 @@ public class Main {
 							fetcher.fetchCoordinates();
 							cache.addGeocode(input, fetcher.getCoordinates());
 						} catch (Exception fetchEx) {
-							fetchEx.getMessage();
+							System.out.println(fetchEx.getMessage());
 						}
 					}
 					if (fetcher.getCoordinates() == null)
@@ -42,17 +42,23 @@ public class Main {
 							fetcher.fetchTemperature();
 							cache.addWeather(fetcher.getCoordinates(), fetcher.getTemperature());
 						} catch (Exception fetchEx) {
-							fetchEx.getMessage();
+							System.out.println(fetchEx.getMessage());
 						}
 					}
 					if (fetcher.getTemperature() == Double.NaN)
 						throw new RuntimeException("Failed to fetch temperature from meteo API");
 					
 					return fetcher.getTemperature();
-				});
+				}, executor);
 
-				future.thenAcceptAsync(temp -> System.out.printf("Temperature in %s: %.1f", input, temp), executor);
-				// TODO: handle exceptions
+				future
+					.exceptionally(ex -> {
+						System.out.println(ex.getMessage());
+						throw new RuntimeException(ex.getMessage());
+					})
+					.thenAcceptAsync(temp -> System.out.printf("Temperature in %s: %.1f", input, temp));
+				
+				// TODO: check json parser and convert whitespaces into %20
 			
 			} while (true);
 
