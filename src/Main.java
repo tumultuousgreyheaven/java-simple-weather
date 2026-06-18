@@ -56,9 +56,9 @@ public class Main {
 						System.out.println(ex.getMessage());
 						throw new RuntimeException(ex.getMessage());
 					})
-					.thenAcceptAsync(temp -> System.out.printf("Temperature in %s: %.1f", input, temp));
+					.thenAcceptAsync(temp -> System.out.printf("Temperature in %s: %.1f\n", input, temp));
 				
-				// TODO: check json parser and convert whitespaces into %20
+				// TODO: convert whitespaces into %20
 			
 			} while (true);
 

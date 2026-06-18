@@ -48,7 +48,7 @@ public class DataFetcher {
         
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() == 200) {
-            String current = JsonParser.findFieldAsString(response.body(), "current");
+            String current = JsonParser.findObjectField(response.body(), "current");
             this.temperature = JsonParser.findDoubleField(current, "temperature_2m");
         } else {
             throw new RuntimeException("Error while fetching from API: " + response.statusCode());
