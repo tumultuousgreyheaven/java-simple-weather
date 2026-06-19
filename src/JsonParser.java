@@ -17,17 +17,6 @@ public class JsonParser {
     }
 
     public static String findObjectField(String json, String field) throws Exception {
-        /*
-        Pattern pattern = Pattern.compile("\"" + field + "\":\\{(.*)\\}");
-        Matcher matcher = pattern.matcher(json);
-        if (matcher.find()) {
-            String entry = matcher.group();
-            return entry.split(":")[1];
-        } else {
-            throw new Exception("Cannot find field " + field);
-        }
-        */
-
         int startField = json.indexOf("\"" + field + "\":");
         if (startField >= 0) {
             startField += 3 + field.length();

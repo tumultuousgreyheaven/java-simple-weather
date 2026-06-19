@@ -57,7 +57,15 @@ public class Main {
 						System.out.println(ex.getMessage());
 						throw new RuntimeException(ex.getMessage());
 					})
-					.thenAcceptAsync(temp -> System.out.printf("Temperature in %s: %.1f\n", fetcher.getCity(), temp));
+					.thenAcceptAsync(
+						temp -> System.out.printf(
+							"Temperature in %s (%.4f, %.4f): %.1f\n",
+							fetcher.getCity(),
+							fetcher.getCoordinates().getLatitude(),
+							fetcher.getCoordinates().getLongitude(),
+							temp
+						)
+					);
 			
 			} while (true);
 
