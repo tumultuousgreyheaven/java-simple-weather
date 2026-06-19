@@ -19,7 +19,6 @@ public class Main {
 			
 				input = input.replace(" ", "%20");
 				DataFetcher fetcher = new DataFetcher(input);
-				System.out.println(input);
 
 				CompletableFuture<Double> future = CompletableFuture.supplyAsync(() -> {
 					try {
