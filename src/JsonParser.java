@@ -42,6 +42,7 @@ public class JsonParser {
                 if (c == '}')
                     braceStack.pop();
                 ret += c;
+                i++;
             } while (!braceStack.isEmpty());
 
             return ret;
