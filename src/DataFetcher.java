@@ -72,4 +72,8 @@ public class DataFetcher {
         return this.temperature;
     }
 
+    public String getCity() {
+        return this.city;
+    }
+
 }

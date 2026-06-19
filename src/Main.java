@@ -17,16 +17,18 @@ public class Main {
 				if (input.equals("close") || input.equals("exit") || input.equals("quit"))
 					break;
 			
+				input = input.replace(" ", "%20");
 				DataFetcher fetcher = new DataFetcher(input);
+				System.out.println(input);
 
 				CompletableFuture<Double> future = CompletableFuture.supplyAsync(() -> {
 					try {
-						Coordinates coords = cache.getGeocode(input);
+						Coordinates coords = cache.getGeocode(fetcher.getCity());
 						fetcher.setCoordinates(coords);
 					} catch (Exception ex) {
 						try {
 							fetcher.fetchCoordinates();
-							cache.addGeocode(input, fetcher.getCoordinates());
+							cache.addGeocode(fetcher.getCity(), fetcher.getCoordinates());
 						} catch (Exception fetchEx) {
 							System.out.println(fetchEx.getMessage());
 						}
@@ -56,9 +58,7 @@ public class Main {
 						System.out.println(ex.getMessage());
 						throw new RuntimeException(ex.getMessage());
 					})
-					.thenAcceptAsync(temp -> System.out.printf("Temperature in %s: %.1f\n", input, temp));
-				
-				// TODO: convert whitespaces into %20
+					.thenAcceptAsync(temp -> System.out.printf("Temperature in %s: %.1f\n", fetcher.getCity(), temp));
 			
 			} while (true);
 
