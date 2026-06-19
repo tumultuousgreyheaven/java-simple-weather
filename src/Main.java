@@ -60,7 +60,7 @@ public class Main {
 					.thenAcceptAsync(
 						temp -> System.out.printf(
 							"Temperature in %s (%.4f, %.4f): %.1f\n",
-							fetcher.getCity(),
+							fetcher.getCity().replace("%20", " "),
 							fetcher.getCoordinates().getLatitude(),
 							fetcher.getCoordinates().getLongitude(),
 							temp
